@@ -144,26 +144,6 @@ plugins = ["mypy_django_plugin.main"]
 django_settings_module = "tests.settings"
 ignore_missing_model_attributes = "True"
 
-[tool.forge.conformance]
-# Every test module mirrors the path of the module it exercises. The entries
-# below name test files whose subject is not a Python module, so there is
-# nothing for them to mirror. This is a statement about those files, not a
-# waiver: naming a path whose subject *is* a module is a review failure.
-#
-# test_app.py's subject is the Django app registry and the on-disk layout of
-# the installed package. Mirroring it would mean inventing a source module
-# purely to give the test file something to point at.
-#
-# test_demo.py's subject is the demonstration project, which sits beside the
-# package rather than inside it and is not distributed.
-non-mirror-paths = [
-  "tests/test_app.py",
-  "tests/test_demo.py",
-{%- if cookiecutter.browser_tests == "yes" %}
-  "tests/test_browser.py",
-{%- endif %}
-]
-
 [tool.deptry]
 extend_exclude = ["tests/", "demo/", "docs/"]
 

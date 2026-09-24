@@ -220,14 +220,30 @@ class TestBrowserTests:
 
         assert "def chromium" in (generated / "tests/conftest.py").read_text()
 
-    def test_the_conformance_declaration_follows_the_test_file(
-        self, tmp_path: Path
-    ) -> None:
-        with_browser = generate(tmp_path / "yes", browser_tests="yes")
-        without = generate(tmp_path / "no", browser_tests="no")
 
-        assert "tests/test_browser.py" in (with_browser / "pyproject.toml").read_text()
-        assert "tests/test_browser.py" not in (without / "pyproject.toml").read_text()
+class TestNoPrivateToolConfig:
+    def test_pyproject_configures_only_public_tools(self, tmp_path: Path) -> None:
+        """Every `[tool.*]` table names a tool a person can install and read about.
+
+        Configuration for tooling that is not public means nothing to someone
+        who generated this package, and a table they cannot look up is one they
+        will either copy blindly or delete without knowing what it did.
+        """
+        import tomllib
+
+        for browser_tests in ("no", "yes"):
+            generated = generate(tmp_path / browser_tests, browser_tests=browser_tests)
+            tables = tomllib.loads((generated / "pyproject.toml").read_text())["tool"]
+            assert sorted(tables) == [
+                "coverage",
+                "deptry",
+                "django-stubs",
+                "djlint",
+                "mypy",
+                "poetry",
+                "pytest",
+                "ruff",
+            ]
 
 
 class TestNamesAreValidated:

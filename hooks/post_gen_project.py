@@ -4,6 +4,8 @@ Cookiecutter writes every file in the template and has no way to skip one, so
 anything conditional is generated and then deleted here.
 """
 
+import shutil
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -33,17 +35,28 @@ for path in Path(".").rglob("*.md"):
     if "__GENERATED_DATE__" in text:
         path.write_text(text.replace("__GENERATED_DATE__", TODAY), encoding="utf-8")
 
+# The shared build workflow installs with `uv sync --locked`, which fails when
+# there is no lock file, so a new package is born with one.
+LOCKED = False
+if shutil.which("uv") is not None:
+    LOCKED = subprocess.run(["uv", "lock"], check=False).returncode == 0
+
+LOCK_NOTE = (
+    "uv.lock is written, but nothing has been committed."
+    if LOCKED
+    else "uv could not write uv.lock. Install uv, then run `uv lock` before committing."
+)
+
 print(  # noqa: T201 - the hook's whole job at this point is to talk to a person
     f"""
-{DISTRIBUTION} is written. It does not have a dependency lock file yet, and
-nothing has been committed.
+{DISTRIBUTION} is written. {LOCK_NOTE}
 
   cd {DISTRIBUTION}
-  poetry install
-  poetry run pytest
-  poetry run pre-commit install && poetry run pre-commit run --all-files
-  poetry run python manage.py migrate && poetry run python manage.py seed_demo
-  poetry run python manage.py runserver
+  uv sync
+  uv run pytest
+  uv run pre-commit install && uv run pre-commit run --all-files
+  uv run python manage.py migrate && uv run python manage.py seed_demo
+  uv run python manage.py runserver
 
 The test suite passes on a freshly generated package, so a failure here is
 about the environment rather than about the code.

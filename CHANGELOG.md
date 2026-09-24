@@ -10,6 +10,20 @@ start at `0.0.1` whatever version generated them.
 
 ## [Unreleased]
 
+### Changed
+
+- This repository builds and develops with uv instead of Poetry. Contributors
+  run `uv sync` and `uv run pytest`, and CI installs from `uv.lock`.
+- A generated package builds and develops with uv too. Its `pyproject.toml`
+  uses `[dependency-groups]` and `[tool.uv.sources]` with hatchling as the
+  build backend, its source distribution lists only the package, the readme
+  and the licence, and it arrives with a `uv.lock` already written.
+- Generated workflows call the shared workflows at v0.6.0, which adds Django
+  6.1 to the test matrix. The generated package declares the Django 6.1
+  classifier.
+- Dependabot in a generated package watches `uv.lock` rather than the pip
+  ecosystem.
+
 ### Added
 
 - The template. It generates a package that installs, passes its own tests,

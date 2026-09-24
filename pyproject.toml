@@ -16,17 +16,18 @@ Homepage = "https://github.com/django-mvp/django-mvp-cookiecutter"
 Repository = "https://github.com/django-mvp/django-mvp-cookiecutter"
 Issues = "https://github.com/django-mvp/django-mvp-cookiecutter/issues"
 
-[tool.poetry]
+[tool.uv]
 # Not a distribution. This repository is cloned or read by cookiecutter, never
-# installed, so there is no package to include.
-package-mode = false
-requires-poetry = '>=2.0,<3.0'
+# installed, so there is no package to build.
+package = false
 
-[tool.poetry.group.dev.dependencies]
-cookiecutter = "^2.6"
-pytest = "^8.3"
-pyyaml = "^6.0"
-ruff = "^0.14"
+[dependency-groups]
+dev = [
+    "cookiecutter>=2.6,<3.0",
+    "pytest>=8.3,<9.0",
+    "pyyaml>=6.0,<7.0",
+    "ruff>=0.14,<0.15",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

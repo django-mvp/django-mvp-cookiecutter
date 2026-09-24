@@ -4,7 +4,7 @@
   "description": "A short sentence saying what this package adds to a django-mvp project",
   "verbose_name": "{{ cookiecutter.import_name.replace('mvp_', '').replace('_', ' ').title() }}",
   "browser_tests": ["no", "yes"],
-  "_shared_tag": "v0.4.1",
+  "_shared_tag": "v0.6.0",
   "_django_mvp_floor": "0.24.0",
   "_author_name": "Samuel Jennings",
   "_author_email": "samuel.scott.jennings@gmail.com",

@@ -1,0 +1,114 @@
+name: CI
+
+# What a template can get wrong is not whether its files exist — it is whether
+# what comes out of it works. So the real job here generates a package,
+# installs it for real, and runs its suite and its linters, exactly as a person
+# would on the day they generate one.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  template:
+    name: Template
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install
+        run: poetry install --no-interaction
+
+      - name: Lint the template's own code
+        # Explicit paths, not `.`: ruff discovers the generated package's
+        # pyproject.toml while walking the tree and fails trying to parse it as
+        # TOML, because at rest it is still Jinja. Excluding the directory does
+        # not prevent that — discovery happens before exclusion.
+        run: |
+          poetry run ruff check hooks scripts tests
+          poetry run ruff format --check hooks scripts tests
+
+      - name: Test
+        run: poetry run pytest
+
+  generated:
+    name: Generated package (browser tests: ${{ matrix.browser-tests }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      matrix:
+        browser-tests: ['no', 'yes']
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install the template's tooling
+        run: poetry install --no-interaction
+
+      - name: Generate a package
+        run: |
+          mkdir -p ../generated
+          poetry run cookiecutter . --no-input \
+            -o ../generated \
+            distribution_name=django-mvp-generated \
+            description="Generated in CI to prove the template works" \
+            browser_tests=${{ matrix.browser-tests }}
+
+      - name: Install it
+        working-directory: ../generated/django-mvp-generated
+        run: poetry install --no-interaction
+
+      - name: Install chromium
+        if: matrix.browser-tests == 'yes'
+        working-directory: ../generated/django-mvp-generated
+        run: poetry run playwright install --with-deps chromium
+
+      - name: Run its tests
+        working-directory: ../generated/django-mvp-generated
+        # CI is what makes the generated suite fail on a missing browser rather
+        # than skip. A skipped test reads as a passing one on a checks page.
+        env:
+          CI: 'true'
+        run: poetry run pytest
+
+      - name: Run its linters
+        working-directory: ../generated/django-mvp-generated
+        # The hooks only see files git knows about, so the tree is committed
+        # first. A generated package that needs reformatting before its first
+        # commit is a defect in the template, not in the package.
+        run: |
+          git init -q
+          git -c user.email=ci@example.com -c user.name=CI add -A
+          poetry run pre-commit run --all-files
+
+      - name: Confirm nothing was reformatted
+        working-directory: ../generated/django-mvp-generated
+        run: git diff --exit-code
+
+      - name: Build it
+        working-directory: ../generated/django-mvp-generated
+        run: |
+          poetry check --lock
+          poetry build

@@ -1,0 +1,28 @@
+name: Pins
+
+# Deliberately not run on pull requests. An upstream release that landed
+# yesterday has nothing to do with the change under review, and turning that
+# pull request red teaches everyone to ignore the signal.
+
+on:
+  schedule:
+    # Mondays, before the week's work starts.
+    - cron: '0 7 * * 1'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Are the pins current
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Check
+        run: python scripts/check_pins.py

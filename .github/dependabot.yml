@@ -1,0 +1,43 @@
+# One group per ecosystem matching "*", so a cycle's updates arrive as a single
+# pull request rather than one per package.
+#
+# This watches the template repository's own tooling. What a *generated*
+# package pins is data in cookiecutter.json, which Dependabot cannot read —
+# scripts/check_pins.py covers that, run weekly by .github/workflows/pins.yml.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

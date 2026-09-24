@@ -43,11 +43,17 @@ jobs:
           poetry run ruff check hooks scripts tests
           poetry run ruff format --check hooks scripts tests
 
+      - name: Lint this repository's workflows
+        run: |
+          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+
       - name: Test
         run: poetry run pytest
 
   generated:
-    name: Generated package (browser tests: ${{ matrix.browser-tests }})
+    # Quoted: an unquoted YAML scalar cannot carry a colon followed by a space.
+    name: "Generated package (browser tests: ${{ matrix.browser-tests }})"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -75,6 +81,14 @@ jobs:
             distribution_name=django-mvp-generated \
             description="Generated in CI to prove the template works" \
             browser_tests=${{ matrix.browser-tests }}
+
+      - name: Lint its workflows
+        # The generated workflows cannot be linted at rest: until cookiecutter
+        # renders them they are Jinja, not YAML. This is the only place they
+        # are ever real files.
+        run: |
+          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color ../generated/django-mvp-generated/.github/workflows/*.yml
 
       - name: Install it
         working-directory: ../generated/django-mvp-generated

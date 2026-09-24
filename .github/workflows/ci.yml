@@ -24,15 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: '3.13'
 
-      - name: Install Poetry
-        run: pipx install poetry
-
       - name: Install
-        run: poetry install --no-interaction
+        run: uv sync --locked
 
       - name: Lint the template's own code
         # Explicit paths, not `.`: ruff discovers the generated package's
@@ -40,8 +38,8 @@ jobs:
         # TOML, because at rest it is still Jinja. Excluding the directory does
         # not prevent that — discovery happens before exclusion.
         run: |
-          poetry run ruff check hooks scripts tests
-          poetry run ruff format --check hooks scripts tests
+          uv run ruff check hooks scripts tests
+          uv run ruff format --check hooks scripts tests
 
       - name: Lint this repository's workflows
         run: |
@@ -49,7 +47,7 @@ jobs:
           ./actionlint -color
 
       - name: Test
-        run: poetry run pytest
+        run: uv run pytest
 
   generated:
     # Quoted: an unquoted YAML scalar cannot carry a colon followed by a space.
@@ -63,20 +61,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: '3.13'
 
-      - name: Install Poetry
-        run: pipx install poetry
-
       - name: Install the template's tooling
-        run: poetry install --no-interaction
+        run: uv sync --locked
 
       - name: Generate a package
         run: |
           mkdir -p ../generated
-          poetry run cookiecutter . --no-input \
+          uv run cookiecutter . --no-input \
             -o ../generated \
             distribution_name=django-mvp-generated \
             description="Generated in CI to prove the template works" \
@@ -92,12 +88,12 @@ jobs:
 
       - name: Install it
         working-directory: ../generated/django-mvp-generated
-        run: poetry install --no-interaction
+        run: uv sync --locked
 
       - name: Install chromium
         if: matrix.browser-tests == 'yes'
         working-directory: ../generated/django-mvp-generated
-        run: poetry run playwright install --with-deps chromium
+        run: uv run playwright install --with-deps chromium
 
       - name: Run its tests
         working-directory: ../generated/django-mvp-generated
@@ -105,7 +101,7 @@ jobs:
         # than skip. A skipped test reads as a passing one on a checks page.
         env:
           CI: 'true'
-        run: poetry run pytest
+        run: uv run pytest
 
       - name: Run its linters
         working-directory: ../generated/django-mvp-generated
@@ -115,7 +111,7 @@ jobs:
         run: |
           git init -q
           git -c user.email=ci@example.com -c user.name=CI add -A
-          poetry run pre-commit run --all-files
+          uv run pre-commit run --all-files
 
       - name: Confirm nothing was reformatted
         working-directory: ../generated/django-mvp-generated
@@ -124,5 +120,5 @@ jobs:
       - name: Build it
         working-directory: ../generated/django-mvp-generated
         run: |
-          poetry check --lock
-          poetry build
+          uv lock --check
+          uv build

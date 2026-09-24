@@ -87,18 +87,18 @@ and the vocabulary to use in issues and commits lives in
 [CONTEXT.md](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/blob/main/CONTEXT.md).
 
 ```bash
-poetry install
-poetry run pytest
-poetry run pre-commit install
+uv sync
+uv run pytest
+uv run pre-commit install
 ```
 
 `demo/` is a Django project on django-mvp's application shell, for looking at
 this package in a browser while working on it:
 
 ```bash
-poetry run python manage.py migrate
-poetry run python manage.py seed_demo
-poetry run python manage.py runserver
+uv run python manage.py migrate
+uv run python manage.py seed_demo
+uv run python manage.py runserver
 ```
 
 ## License

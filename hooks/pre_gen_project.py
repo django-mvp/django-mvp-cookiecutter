@@ -3,7 +3,7 @@
 Both checks fail before anything is written. A distribution name Python's
 packaging tools will not accept, or a directory name that is not a legal
 module name, surfaces here as one line rather than as a confusing error from
-Poetry or from Django's app registry several minutes later.
+uv or from Django's app registry several minutes later.
 """
 
 import keyword

@@ -10,24 +10,20 @@ documentation structure already in place.
 ## Use it
 
 ```bash
-pipx run cookiecutter gh:django-mvp/django-mvp-cookiecutter
+uvx cookiecutter gh:django-mvp/django-mvp-cookiecutter
 ```
 
-Or with Poetry, if you would rather not install anything globally:
-
-```bash
-poetry run cookiecutter gh:django-mvp/django-mvp-cookiecutter
-```
+`uvx` runs it without installing anything globally.
 
 Then:
 
 ```bash
 cd <your-package>
-poetry install
-poetry run pytest
-poetry run python manage.py migrate
-poetry run python manage.py seed_demo
-poetry run python manage.py runserver
+uv sync
+uv run pytest
+uv run python manage.py migrate
+uv run python manage.py seed_demo
+uv run python manage.py runserver
 ```
 
 The suite passes and the demo project runs before you have written anything.
@@ -60,7 +56,7 @@ generating — it is your repository at that point.
 │   └── ROADMAP.md
 ├── .github/workflows/      build, tests, and the three-step release flow
 ├── AGENTS.md CONTEXT.md GOALS.md CONSTITUTION.md README.md CHANGELOG.md
-└── pyproject.toml codecov.yml ruff-base.toml .pre-commit-config.yaml
+└── pyproject.toml uv.lock codecov.yml ruff-base.toml .pre-commit-config.yaml
 ```
 
 `CONSTITUTION.md` arrives filled in: the standards apply to every package built

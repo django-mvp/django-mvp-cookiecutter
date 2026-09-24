@@ -23,6 +23,7 @@ classifiers = [
     "Framework :: Django",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
+    "Framework :: Django :: 6.1",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
@@ -36,35 +37,45 @@ Homepage = "https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.
 Repository = "https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}"
 Issues = "https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/issues"
 
-[tool.poetry]
+[tool.hatch.build.targets.wheel]
 # The demo project is deliberately absent: it is a place to look at this
 # package while it is being written, not something a consuming project should
 # receive.
-packages = [{ include = "{{ cookiecutter.import_name }}" }]
-requires-poetry = '>=2.0,<3.0'
+packages = ["{{ cookiecutter.import_name }}"]
+
+# Hatchling's default source distribution is the whole working tree: tests, the
+# demonstration project, documentation and CI configuration. Listing what ships
+# keeps it to the package, the readme and the licence. Hatchling adds
+# .gitignore itself, so that a build from the source distribution leaves out
+# what the repository does. The leading slashes anchor each entry to the
+# repository root, so `/README.md` does not also match `tests/README.md`.
+[tool.hatch.build.targets.sdist]
+include = ["/{{ cookiecutter.import_name }}", "/README.md", "/LICENSE"]
 
 # django-cotton is deliberately absent from the dependency list. django-mvp
 # pins it exactly, and a second constraint here could only ever fight that one.
 # This package has no say in which version a project runs.
 
-[tool.poetry.group.dev.dependencies]
+[dependency-groups]
 # Shared toolchain bundle, pinned to a release tag so every package built this
 # way runs one version of each tool. Ships ruff, mypy, deptry, pre-commit,
 # pytest, pytest-django, pytest-xdist, factory-boy, coverage and django-stubs.
-mvp-shared = { git = "https://github.com/django-mvp/shared.git", tag = "{{ cookiecutter._shared_tag }}", extras = [
-    "dev",
-    "test",
-] }
+dev = [
+    "mvp-shared[dev,test]",
 {%- if cookiecutter.browser_tests == "yes" %}
-# Some guarantees can only be measured in a real browser: a resolved height, a
-# computed colour, an element that moves when the window does. Rendered markup
-# cannot answer any of them.
-pytest-playwright = ">=0.5"
+    # Some guarantees can only be measured in a real browser: a resolved height,
+    # a computed colour, an element that moves when the window does. Rendered
+    # markup cannot answer any of them.
+    "pytest-playwright>=0.5",
 {%- endif %}
+]
+
+[tool.uv.sources]
+mvp-shared = { git = "https://github.com/django-mvp/shared.git", tag = "{{ cookiecutter._shared_tag }}" }
 
 [build-system]
-requires = ['poetry-core (>=2.0,<3.0)']
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"

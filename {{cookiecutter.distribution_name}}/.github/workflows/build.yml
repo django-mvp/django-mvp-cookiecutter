@@ -7,7 +7,7 @@ on:
     paths:
       - '{{ cookiecutter.import_name }}/**'
       - 'pyproject.toml'
-      - 'poetry.lock'
+      - 'uv.lock'
       - '.pre-commit-config.yaml'
       - 'ruff-base.toml'
       - '.github/workflows/build.yml'

@@ -121,7 +121,24 @@ class TestGeneratedLayout:
         import tomllib
 
         pyproject = tomllib.loads((generated / "pyproject.toml").read_text())
-        assert pyproject["tool"]["poetry"]["packages"] == [{"include": "mvp_example"}]
+        assert pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]["packages"] == [
+            "mvp_example"
+        ]
+
+    def test_the_package_is_born_locked(self, generated: Path) -> None:
+        """The shared build installs with `uv sync --locked`, which needs a lock."""
+        assert (generated / "uv.lock").is_file()
+        assert not (generated / "poetry.lock").exists()
+
+    def test_the_source_distribution_lists_only_what_ships(
+        self, generated: Path
+    ) -> None:
+        """Anchored entries, so `/README.md` cannot also match `tests/README.md`."""
+        import tomllib
+
+        pyproject = tomllib.loads((generated / "pyproject.toml").read_text())
+        sdist = pyproject["tool"]["hatch"]["build"]["targets"]["sdist"]
+        assert sdist["include"] == ["/mvp_example", "/README.md", "/LICENSE"]
 
 
 class TestNothingIsLeftUnrendered:
@@ -239,10 +256,11 @@ class TestNoPrivateToolConfig:
                 "deptry",
                 "django-stubs",
                 "djlint",
+                "hatch",
                 "mypy",
-                "poetry",
                 "pytest",
                 "ruff",
+                "uv",
             ]
 
 

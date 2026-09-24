@@ -115,17 +115,12 @@ Tests are organised for fast, targeted discovery.
   `tests/test_models.py`, and the per-unit split is expressed with classes, not
   with extra files.
 
-  A test whose subject is not a Python module has nothing to mirror. Those are
-  declared in `pyproject.toml`:
-
-  ```toml
-  [tool.forge.conformance]
-  non-mirror-paths = ["tests/test_components/"]
-  ```
-
-  A trailing slash marks a directory prefix. This is a declaration, not a
-  waiver: it states that no source module exists to mirror. Declaring a path
-  whose subject *is* a module is a review failure.
+  A test whose subject is not a Python module has nothing to mirror and is
+  exempt: `tests/test_app.py` (the installed app and its on-disk layout),
+  `tests/test_demo.py` (the demo project, which is not distributed), and tests
+  of templates or other non-Python artifacts. The exemption is a statement that
+  no source module exists. Claiming it for a test whose subject *is* a module
+  is a review failure.
 
 - **Group related tests into classes.** Within a module, tests are grouped into
   `Test<Subject>` classes, so one area can be targeted while debugging:

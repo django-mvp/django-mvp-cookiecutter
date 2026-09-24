@@ -36,7 +36,7 @@ roadmap, in the specifications, and in review, never by the goal itself.
 
 This file carries no version numbers and no release plan; that lives in
 [the roadmap](docs/ROADMAP.md). For what the package is, what it stays out of,
-and the principles that settle a close call, read the *Scope and philosophy*
+and the principles that settle a close call, read the *Scope & philosophy*
 section of the [README](README.md).
 
 Importance is a tag on each goal, not a ranking:

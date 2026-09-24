@@ -16,7 +16,7 @@
 
   Sections, in this order:
     1. One sentence, above. What it does, for whom.
-    2. Scope and philosophy — below. What it is and is not, and the principles
+    2. Scope & philosophy — below. What it is and is not, and the principles
        that settle a close call.
     3. Installation.
     4. Quickstart — the smallest thing that works, end to end.
@@ -27,7 +27,7 @@
   Keep the CHANGELOG out of it. Link to it instead.
 -->
 
-## Scope and philosophy
+## Scope & philosophy
 
 <!--
   What this package is for, what it stays out of, and how a close call gets

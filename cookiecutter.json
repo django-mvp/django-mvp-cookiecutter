@@ -11,6 +11,7 @@
   "_github_owner": "django-mvp",
   "_copy_without_render": [
     "*templates/cotton/*",
-    "*demo/templates/base.html"
+    "*demo/templates/base.html",
+    "*docs/contributing/standards/*"
   ]
 }

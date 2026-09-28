@@ -85,8 +85,8 @@ Cotton maps a tag's first segment onto that directory, so
 
 The directory name is load-bearing and fails quietly: a component Cotton cannot
 resolve renders as empty output rather than raising, so renaming the directory
-breaks every tag in it without an error anywhere. `tests/test_app.py` asserts
-the directory exists for that reason.
+breaks every tag in it without an error anywhere. `tests/test_smoke.py`
+asserts the directory exists for that reason.
 
 ## Releasing
 

@@ -1,14 +1,4 @@
-"""Put the demo project into a state every page can be looked at from.
-
-Three sign-ins, because the application shell renders differently for each: an
-ordinary account, one with access to the admin, and one with everything. A
-reviewer opening this project should not have to invent a login or read the
-code to find out what exists.
-
-Safe to run repeatedly, and refuses to run at all unless DEBUG is on — these
-are known passwords, and the only thing standing between them and a deployed
-site is that this command will not execute there.
-"""
+"""Management command that creates the demo project's sign-in accounts."""
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -24,9 +14,14 @@ ACCOUNTS = [
 
 
 class Command(BaseCommand):
+    """Create one regular, one staff and one superuser account, all idempotently."""
+
     help = "Create the demo sign-in accounts."
 
     def handle(self, *args, **options):
+        """Refuse unless DEBUG is on, then create or reset each account."""
+        # Known passwords: refusing to run without DEBUG is what keeps them off a
+        # deployed site.
         if not settings.DEBUG:
             raise CommandError(
                 "seed_demo creates accounts with a known password and only "

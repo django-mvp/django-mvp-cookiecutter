@@ -1,18 +1,7 @@
-"""Django settings for testing {{ cookiecutter.distribution_name }}.
+"""Django settings for testing {{ cookiecutter.distribution_name }}."""
 
-The application configuration — INSTALLED_APPS, MIDDLEWARE, TEMPLATES,
-EASY_ICONS, FLEX_MENUS, MVP_CONFIG — lives in ``demo/settings.py`` and is
-inherited here rather than restated.
-
-Restating it would mean two descriptions of one application shell, and the
-failure that produces is the quiet one: the suite stays green against its own
-copy while the project a reader actually opens is broken. Cotton resolves a
-component it cannot find to empty output, so that break leaves no error
-anywhere.
-
-Only what a test run needs differently is set below.
-"""
-
+# Everything else is inherited from demo/settings.py rather than restated, so the
+# suite cannot stay green against its own copy while the demo is broken.
 from demo.settings import *  # noqa: F403
 
 SECRET_KEY = "django-insecure-test-key-for-{{ cookiecutter.import_name }}-tests-only"

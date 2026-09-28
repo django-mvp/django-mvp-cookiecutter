@@ -1,3 +1,5 @@
+"""URL routes for the demo project."""
+
 from django.urls import include, path
 
 from demo.views import OverviewView

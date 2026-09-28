@@ -1,10 +1,4 @@
-"""Settings for the demo project.
-
-A demonstration target, never deployed. It runs on the development server so
-this package can be looked at in a browser while it is being built, and it is
-the one description of the application shell — `tests/settings.py` inherits
-from this file rather than restating it.
-"""
+"""Settings for the demo project, a demonstration target that is never deployed."""
 
 from pathlib import Path
 
@@ -25,11 +19,8 @@ ALLOWED_HOSTS = ["*"]
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-# This project's own apps come first so its templates win over any the
-# libraries ship under the same name, which is how demo/templates/base.html
-# reaches the pages that extend "base.html". Take care adding to that
-# directory: a file named after one django-mvp ships replaces it everywhere,
-# silently, for every page in the demo.
+# Own apps first so demo/templates/base.html wins over the libraries' copies.
+# A template here named after one django-mvp ships replaces it everywhere.
 INSTALLED_APPS = [
     "demo",
     "{{ cookiecutter.import_name }}",

@@ -1,10 +1,7 @@
-"""Reject names that would produce a package nobody can install or import.
+"""Refuse a distribution or import name nobody could install or import."""
 
-Both checks fail before anything is written. A distribution name Python's
-packaging tools will not accept, or a directory name that is not a legal
-module name, surfaces here as one line rather than as a confusing error from
-uv or from Django's app registry several minutes later.
-"""
+# Fails before anything is written, as one line rather than an error from uv or
+# Django's app registry several minutes later.
 
 import keyword
 import re
@@ -18,6 +15,11 @@ DISTRIBUTION_PATTERN = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$")
 
 
 def fail(message: str) -> None:
+    """Print the reason and stop generation.
+
+    Args:
+        message: Why the name was refused.
+    """
     sys.stderr.write(f"\nERROR: {message}\n\n")
     sys.exit(1)
 

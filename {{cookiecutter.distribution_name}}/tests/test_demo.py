@@ -1,13 +1,10 @@
-"""The demo project renders.
+"""The demo project's pages, asserted as rendered."""
 
-Everything in the demo fails quietly. An unresolvable Cotton component renders
-as empty output, a Tailwind class the packaged stylesheet does not emit does
-nothing, and a menu entry whose URL will not resolve is dropped from the tree.
-None of those raise, so the demo is asserted against its rendered pages rather
-than against the objects that built them.
-"""
+# Everything in the demo fails quietly: an unresolvable component renders empty
+# and a menu entry whose URL will not resolve is dropped from the tree.
 
-from django.urls import reverse
+{% if cookiecutter.browser_tests == "yes" %}import pytest
+{% endif %}from django.urls import reverse
 
 
 class TestOverviewPage:
@@ -15,25 +12,29 @@ class TestOverviewPage:
         assert client.get(reverse("overview")).status_code == 200
 
     def test_the_shell_wraps_it(self, overview_page: str) -> None:
-        """The page is inside django-mvp's application shell, not bare.
-
-        A template that fails to extend the shell still returns 200 and still
-        shows its own content, so the status code proves nothing about this.
-        """
+        # A template that fails to extend the shell still returns 200.
         assert 'aria-label="Main navigation"' in overview_page
 
-    def test_the_sidebar_holds_the_pages_that_exist(self, overview_page: str) -> None:
-        """A menu entry naming a route that will not resolve is dropped.
+    def test_the_sidebar_links_the_pages_that_exist(self, overview_page: str) -> None:
+        sidebar = overview_page.split('aria-label="Main navigation"', 1)[1]
+        sidebar = sidebar.split("</ul>", 1)[0]
+        assert f'href="{reverse("overview")}"' in sidebar
+{%- if cookiecutter.browser_tests == "yes" %}
 
-        It is dropped silently, which is why the assertion is on the rendered
-        sidebar rather than on the menu tree that produced it.
-        """
-        assert "Overview" in overview_page
 
-    def test_the_starter_component_reached_the_page(self, overview_page: str) -> None:
-        """Delete this test with the starter component.
+@pytest.mark.django_db
+class TestOverviewPageInABrowser:
+    # Only what a real browser can measure belongs here. A check that works on
+    # rendered HTML goes in the class above, which cannot skip.
 
-        Cotton renders a component it cannot resolve as empty output, so this
-        is the assertion that would catch a moved or renamed template.
-        """
-        assert "It renders" in overview_page
+    def test_the_page_loads_without_a_console_error(
+        self, chromium, live_server, page
+    ) -> None:
+        # A script that throws leaves the markup intact and the page broken.
+        errors: list[str] = []
+        page.on("pageerror", lambda exception: errors.append(str(exception)))
+
+        page.goto(live_server.url + reverse("overview"))
+
+        assert errors == []
+{%- endif %}

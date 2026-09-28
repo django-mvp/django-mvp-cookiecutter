@@ -1,11 +1,7 @@
-"""What the template produces, asserted without installing anything.
+"""What the template produces, asserted without installing anything."""
 
-These run in a second and cover the failures that are cheap to make and
-expensive to find: a placeholder that never got substituted, a file that should
-not have been generated, a name derived wrongly. Whether the generated package
-actually installs and passes its own suite is a separate question, answered by
-the workflow in .github/workflows/ci.yml, which does exactly that.
-"""
+# Whether a generated package installs and passes its own suite is answered by
+# .github/workflows/ci.yml, which does exactly that.
 
 import json
 import subprocess
@@ -42,13 +38,10 @@ def text_files(root: Path) -> list[Path]:
 
 @pytest.fixture(scope="module")
 def generated(tmp_path_factory) -> Path:
-    """One package generated with the defaults, shared across the read-only tests."""
     return generate(tmp_path_factory.mktemp("default"))
 
 
 class TestGeneratedLayout:
-    """The files a package cannot work without."""
-
     @pytest.mark.parametrize(
         "relative_path",
         [
@@ -70,6 +63,8 @@ class TestGeneratedLayout:
             "docs/agents/domain.md",
             "docs/agents/issue-tracker.md",
             "docs/agents/triage-labels.md",
+            "docs/contributing/standards/testing.md",
+            "docs/contributing/standards/code-documentation.md",
             ".github/dependabot.yml",
             ".github/workflows/build.yml",
             ".github/workflows/tests.yml",
@@ -88,7 +83,7 @@ class TestGeneratedLayout:
             "demo/templates/demo/overview.html",
             "tests/conftest.py",
             "tests/settings.py",
-            "tests/test_app.py",
+            "tests/test_smoke.py",
             "tests/test_demo.py",
         ],
     )
@@ -103,21 +98,13 @@ class TestGeneratedLayout:
     def test_the_cotton_namespace_matches_the_import_name(
         self, generated: Path
     ) -> None:
-        """The directory name is the first segment of every tag this ships.
-
-        Cotton renders a component it cannot resolve as empty output rather
-        than raising, so a mismatch here breaks every tag with no error.
-        """
+        # Cotton renders a tag it cannot resolve as empty output, so a mismatch
+        # breaks every tag with no error.
         namespace = generated / "mvp_example" / "templates" / "cotton" / "mvp_example"
         assert namespace.is_dir()
 
     def test_the_demo_project_is_not_packaged(self, generated: Path) -> None:
-        """`demo/` is a place to look at the package, not something to ship.
-
-        Asserted as an exact list rather than as the absence of the word
-        "demo": a second entry added here reaches every install, and the
-        difference between one entry and two is the whole point.
-        """
+        # An exact list: a second entry here reaches every install.
         import tomllib
 
         pyproject = tomllib.loads((generated / "pyproject.toml").read_text())
@@ -126,14 +113,14 @@ class TestGeneratedLayout:
         ]
 
     def test_the_package_is_born_locked(self, generated: Path) -> None:
-        """The shared build installs with `uv sync --locked`, which needs a lock."""
+        # The shared build installs with `uv sync --locked`, which needs a lock.
         assert (generated / "uv.lock").is_file()
         assert not (generated / "poetry.lock").exists()
 
     def test_the_source_distribution_lists_only_what_ships(
         self, generated: Path
     ) -> None:
-        """Anchored entries, so `/README.md` cannot also match `tests/README.md`."""
+        # Anchored entries, so `/README.md` cannot also match `tests/README.md`.
         import tomllib
 
         pyproject = tomllib.loads((generated / "pyproject.toml").read_text())
@@ -142,8 +129,6 @@ class TestGeneratedLayout:
 
 
 class TestNothingIsLeftUnrendered:
-    """The failure that survives every other check by looking like content."""
-
     def test_no_placeholder_survives(self, generated: Path) -> None:
         offenders = [
             str(path.relative_to(generated))
@@ -167,12 +152,17 @@ class TestNothingIsLeftUnrendered:
         assert date.today().isoformat() in footer
 
     def test_github_expressions_survived(self, generated: Path) -> None:
-        """A `${{ }}` expression rendered away is a workflow that silently misfires.
-
-        It stays valid YAML and the job still runs — with an empty secret.
-        """
+        # An expression rendered away still runs, with an empty secret.
         workflow = (generated / ".github/workflows/tag-release.yml").read_text()
         assert "${{ secrets.RELEASE_TOKEN }}" in workflow
+
+    def test_the_standards_documents_are_copied_unrendered(
+        self, generated: Path
+    ) -> None:
+        for name in ("testing.md", "code-documentation.md"):
+            relative_path = Path("docs/contributing/standards") / name
+            source = TEMPLATE / "{{cookiecutter.distribution_name}}" / relative_path
+            assert (generated / relative_path).read_text() == source.read_text()
 
     def test_django_template_syntax_survived(self, generated: Path) -> None:
         component = (
@@ -199,7 +189,7 @@ class TestImportNameIsDerived:
         assert (generated / expected / "apps.py").is_file()
 
     def test_an_override_wins(self, tmp_path: Path) -> None:
-        """django-accounts-center imports as `dac`, which nothing could derive."""
+        # django-accounts-center imports as `dac`, which nothing could derive.
         generated = generate(
             tmp_path, distribution_name="django-accounts-center", import_name="dac"
         )
@@ -208,7 +198,10 @@ class TestImportNameIsDerived:
 
 class TestBrowserTests:
     def test_they_are_absent_by_default(self, generated: Path) -> None:
-        assert not (generated / "tests/test_browser.py").exists()
+        assert (
+            "TestOverviewPageInABrowser"
+            not in (generated / "tests/test_demo.py").read_text()
+        )
         assert (
             "install-playwright"
             not in (generated / ".github/workflows/tests.yml").read_text()
@@ -216,16 +209,14 @@ class TestBrowserTests:
         assert "playwright" not in (generated / "pyproject.toml").read_text()
 
     def test_asking_for_them_wires_the_whole_chain(self, tmp_path: Path) -> None:
-        """The test file alone is not enough, and it fails quietly without the rest.
-
-        Without the CI input there is no browser, without the dependency there
-        is no playwright, and without the async-unsafe setting the database
-        never builds. Any one missing turns these into skips, which a checks
-        page cannot tell from passes.
-        """
+        # Any one link missing turns these tests into skips, which a checks page
+        # cannot tell from passes.
         generated = generate(tmp_path, browser_tests="yes")
 
-        assert (generated / "tests/test_browser.py").is_file()
+        assert (
+            "TestOverviewPageInABrowser"
+            in (generated / "tests/test_demo.py").read_text()
+        )
         assert (
             "install-playwright: true"
             in (generated / ".github/workflows/tests.yml").read_text()
@@ -240,12 +231,7 @@ class TestBrowserTests:
 
 class TestNoPrivateToolConfig:
     def test_pyproject_configures_only_public_tools(self, tmp_path: Path) -> None:
-        """Every `[tool.*]` table names a tool a person can install and read about.
-
-        Configuration for tooling that is not public means nothing to someone
-        who generated this package, and a table they cannot look up is one they
-        will either copy blindly or delete without knowing what it did.
-        """
+        # A table for a tool nobody can look up gets copied blindly or deleted.
         import tomllib
 
         for browser_tests in ("no", "yes"):
@@ -272,7 +258,6 @@ class TestNamesAreValidated:
     def test_an_unusable_import_name_is_refused(
         self, tmp_path: Path, import_name: str
     ) -> None:
-        """Refused before anything is written, not by Django three steps later."""
         with pytest.raises(FailedHookException):
             generate(tmp_path, import_name=import_name)
 
@@ -287,11 +272,7 @@ class TestNamesAreValidated:
 
 class TestGeneratedPythonParses:
     def test_every_module_compiles(self, generated: Path) -> None:
-        """A placeholder in the wrong place produces a file Python cannot read.
-
-        Nothing else here would notice: the text is present, the path is right,
-        and it only fails when something imports it.
-        """
+        # A misplaced placeholder only fails when something imports the file.
         modules = [str(path) for path in generated.rglob("*.py")]
         result = subprocess.run(
             ["python", "-m", "py_compile", *modules],
@@ -312,17 +293,8 @@ class TestGeneratedPythonParses:
 
 
 class TestGeneratedCodeIsAlreadyClean:
-    """The generated tree passes its own linters before anyone touches it.
-
-    This is not a nicety. The import name is substituted into expressions whose
-    length then decides how the formatter wraps them, so a template that is
-    correctly formatted for a short name can be wrongly formatted for a long
-    one. The two names below are chosen to sit either side of that: whichever
-    way a line wraps, one of them catches it.
-
-    Without this, the first thing a new package does is fail its own lint gate,
-    and the fix looks like a bug in the code rather than in the template.
-    """
+    # The import name's length decides how the formatter wraps lines. These two
+    # names sit either side of that, so one of them catches a wrong wrap.
 
     @pytest.mark.parametrize("import_name", ["dac", "mvp_a_deliberately_long_name"])
     @pytest.mark.parametrize("browser_tests", ["no", "yes"])
@@ -367,12 +339,8 @@ class TestPinsAreConsistent:
     def test_every_shared_reference_uses_the_declared_tag(
         self, generated: Path
     ) -> None:
-        """One tag versions the whole toolchain.
-
-        A workflow left on an older tag than the dependency bundle is the
-        quietest kind of drift: everything still runs, against two different
-        versions of the standard.
-        """
+        # A workflow on an older tag than the bundle still runs, against two
+        # versions of the toolchain.
         tag = json.loads((TEMPLATE / "cookiecutter.json").read_text())["_shared_tag"]
 
         referencing = [
@@ -388,12 +356,8 @@ class TestPinsAreConsistent:
                     assert f"@{tag}" in line, f"{path.name}: {line.strip()}"
 
     def test_the_changelog_has_no_version_heading(self, generated: Path) -> None:
-        """A version heading here makes the first push cut a release nobody prepared.
-
-        Tag Release fires on any push to main touching pyproject.toml, and the
-        absence of a matching `## [X.Y.Z]` section is the only thing stopping
-        it.
-        """
+        # Tag Release fires on any push touching pyproject.toml, and only the
+        # absence of a matching version section stops it.
         changelog = (generated / "CHANGELOG.md").read_text()
         assert "## [Unreleased]" in changelog
         assert "## [0.0.1]" not in changelog

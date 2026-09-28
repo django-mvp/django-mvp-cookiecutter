@@ -1,9 +1,4 @@
-"""The suite's urlconf.
-
-It is the demo project's routes plus whatever a test needs a route for. A
-test-only view is added here rather than in ``demo/urls.py``, so the demo
-project keeps only the pages a person is meant to open.
-"""
+"""The suite's urlconf: the demo project's routes plus any test-only route."""
 
 from demo.urls import urlpatterns
 

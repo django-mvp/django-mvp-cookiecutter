@@ -1,10 +1,7 @@
-"""The demo project's pages.
+"""The demo project's pages."""
 
-Each view subclasses ``MVPTemplateView`` rather than Django's ``TemplateView``:
-that is what supplies the page title, the subtitle and the breadcrumb trail the
-application shell draws around the content.
-"""
-
+# MVPTemplateView, not TemplateView: it supplies the page title, subtitle and
+# breadcrumbs the application shell draws around the content.
 from mvp.views import MVPTemplateView
 
 

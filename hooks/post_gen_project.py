@@ -1,31 +1,11 @@
-"""Stamp today's date, remove what the answers ruled out, then say what next.
-
-Cookiecutter writes every file in the template and has no way to skip one, so
-anything conditional is generated and then deleted here.
-"""
+"""Stamp today's date, lock the dependencies, then say what next."""
 
 import shutil
 import subprocess
 from datetime import date
 from pathlib import Path
 
-BROWSER_TESTS = "{{ cookiecutter.browser_tests }}" == "yes"
 DISTRIBUTION = "{{ cookiecutter.distribution_name }}"
-
-BROWSER_ONLY_FILES = [
-    "tests/test_browser.py",
-]
-
-
-def drop(relative_path: str) -> None:
-    path = Path(relative_path)
-    if path.is_file():
-        path.unlink()
-
-
-if not BROWSER_TESTS:
-    for relative_path in BROWSER_ONLY_FILES:
-        drop(relative_path)
 
 # Cookiecutter has no date of its own without an extension the person running
 # it would have to install, so the placeholder is substituted here instead.

@@ -1,13 +1,4 @@
-"""Shared fixtures for the test suite.
-
-General setup and anything reused across modules lives here. Test modules hold
-assertions, not construction boilerplate.
-
-Once this package has models, each one gets exactly one ``factory_boy``
-factory in ``tests/factories.py``, and the fixtures here are thin wrappers over
-those factories. A one-off variation needs no fixture of its own — call the
-factory inline in the test with the field overridden.
-"""
+"""Fixtures shared across the test suite."""
 
 {% if cookiecutter.browser_tests == "yes" %}import os
 
@@ -20,12 +11,8 @@ from django_cotton.compiler_regex import CottonCompiler
 
 @pytest.fixture(scope="session")
 def render():
-    """Compile a Cotton source string and render it.
-
-    No request is involved. A component that reads nothing off one renders
-    anywhere a template does, including a page assembled outside the request
-    cycle, and this fixture is what holds it to that.
-    """
+    # No request is involved, which holds components to rendering anywhere a
+    # template does, including outside the request cycle.
     compiler = CottonCompiler()
 
     def render_source(source, **context):
@@ -36,21 +23,14 @@ def render():
 
 @pytest.fixture
 def overview_page(client, db):
-    """The demo project's overview page, rendered, as a string."""
     return client.get(reverse("overview")).content.decode()
 {%- if cookiecutter.browser_tests == "yes" %}
 
 
 @pytest.fixture(scope="session")
 def chromium():
-    """A working chromium, or a decision about what its absence means.
-
-    On a contributor's machine a missing browser is a setup step nobody has
-    run yet, and skipping says so without blocking unrelated work. In CI it is
-    a hole in the suite: a checks page cannot tell a skipped test from a
-    passing one, so these would report green while asserting nothing. There,
-    the absence fails.
-    """
+    # Locally a missing browser skips. In CI it fails, because a checks page
+    # cannot tell a skipped test from a passing one.
     from playwright.sync_api import Error, sync_playwright
 
     try:

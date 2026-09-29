@@ -4,7 +4,28 @@
 # and a menu entry whose URL will not resolve is dropped from the tree.
 
 {% if cookiecutter.browser_tests == "yes" %}import pytest
-{% endif %}from django.urls import reverse
+{% endif %}from django.conf import settings
+from django.shortcuts import resolve_url
+from django.urls import reverse
+
+# The address a page guarded by LoginRequiredMixin sends an anonymous visitor to.
+SIGN_IN_URL = resolve_url(settings.LOGIN_URL)
+
+
+class TestSignIn:
+    def test_the_sign_in_page_renders(self, client, db) -> None:
+        assert client.get(SIGN_IN_URL).status_code == 200
+
+    def test_a_seeded_account_can_sign_in(self, client, django_user_model) -> None:
+        django_user_model.objects.create_user(
+            username="regular.user@example.com", password="password"
+        )
+        response = client.post(
+            SIGN_IN_URL,
+            {"username": "regular.user@example.com", "password": "password"},
+        )
+        assert response.status_code == 302
+        assert "_auth_user_id" in client.session
 
 
 class TestOverviewPage:

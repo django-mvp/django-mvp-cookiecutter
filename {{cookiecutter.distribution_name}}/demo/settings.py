@@ -91,6 +91,9 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS: list[dict] = []
 
+# The sign-in page django-mvp's URLs register. Django's default, /accounts/login/,
+# is an address nothing here serves.
+LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 

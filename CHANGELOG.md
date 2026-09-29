@@ -24,6 +24,15 @@ start at `0.0.1` whatever version generated them.
 - Dependabot in a generated package watches `uv.lock` rather than the pip
   ecosystem.
 
+### Fixed
+
+- The generated demo project's sign-in page no longer fails with
+  `TemplateDoesNotExist`. The demo mounted Django's own auth URLs, whose views
+  need `registration/` templates nothing supplied. It now mounts django-mvp's
+  URLs, which serve sign-in and sign-out at `account/login/` and
+  `account/logout/`, and `LOGIN_URL` names that page. The generated suite
+  checks that the page renders and that a seeded account can sign in.
+
 ### Added
 
 - The template. It generates a package that installs, passes its own tests,

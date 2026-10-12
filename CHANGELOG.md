@@ -26,6 +26,13 @@ start at `0.0.1` whatever version generated them.
 
 ### Fixed
 
+- A generated package starts again. Its demo settings loaded
+  `crispy_tailwind`, which django-mvp stopped installing in 0.26.0, so Django
+  failed while loading with `ModuleNotFoundError` and no test ran. The demo
+  now lists `mvp_forms` and `daisy_cotton`, sets the crispy template pack to
+  `daisyui`, and its overview page uses `<c-mvp.section>` and `<c-mvp.text>`,
+  the names django-mvp gives those components since 0.26.0. The django-mvp
+  floor is 0.28.1.
 - The generated demo project's sign-in page no longer fails with
   `TemplateDoesNotExist`. The demo mounted Django's own auth URLs, whose views
   need `registration/` templates nothing supplied. It now mounts django-mvp's

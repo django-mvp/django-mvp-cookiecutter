@@ -5,7 +5,7 @@
   "verbose_name": "{{ cookiecutter.import_name.replace('mvp_', '').replace('_', ' ').title() }}",
   "browser_tests": ["no", "yes"],
   "_shared_tag": "v0.6.0",
-  "_django_mvp_floor": "0.24.0",
+  "_django_mvp_floor": "0.28.1",
   "_author_name": "Samuel Jennings",
   "_author_email": "samuel.scott.jennings@gmail.com",
   "_github_owner": "django-mvp",

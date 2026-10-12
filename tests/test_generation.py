@@ -65,6 +65,7 @@ class TestGeneratedLayout:
             "docs/agents/triage-labels.md",
             "docs/contributing/standards/testing.md",
             "docs/contributing/standards/code-documentation.md",
+            "docs/contributing/standards/django.md",
             ".github/dependabot.yml",
             ".github/workflows/build.yml",
             ".github/workflows/tests.yml",
@@ -159,7 +160,7 @@ class TestNothingIsLeftUnrendered:
     def test_the_standards_documents_are_copied_unrendered(
         self, generated: Path
     ) -> None:
-        for name in ("testing.md", "code-documentation.md"):
+        for name in ("testing.md", "code-documentation.md", "django.md"):
             relative_path = Path("docs/contributing/standards") / name
             source = TEMPLATE / "{{cookiecutter.distribution_name}}" / relative_path
             assert (generated / relative_path).read_text() == source.read_text()

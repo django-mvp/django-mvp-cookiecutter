@@ -32,9 +32,12 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.staticfiles",
     "mvp",
+    # The components django-mvp's own templates are built from. Below "mvp",
+    # so a component both of them have is django-mvp's.
+    "daisy_cotton",
     "easy_icons",
     "crispy_forms",
-    "crispy_tailwind",
+    "mvp_forms",
     "flex_menu",
     "django_cotton",
     # Reloads the browser on a change to a template, a stylesheet or Python. It
@@ -97,8 +100,8 @@ LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ["tailwind"]
-CRISPY_TEMPLATE_PACK = "tailwind"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["daisyui"]
+CRISPY_TEMPLATE_PACK = "daisyui"
 
 # Which class draws the sidebar tree declared in demo/menus.py, and which draws
 # the dock shown below the sidebar breakpoint.

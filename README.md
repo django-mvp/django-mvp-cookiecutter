@@ -53,7 +53,7 @@ generating — it is your repository at that point.
 ├── docs/
 │   ├── adr/                decision records, with the format documented
 │   ├── agents/             issue tracker, labels, domain docs
-│   ├── contributing/       the testing and code-documentation standards
+│   ├── contributing/       the testing, code-documentation and Django standards
 │   └── ROADMAP.md
 ├── .github/workflows/      build, tests, and the three-step release flow
 ├── AGENTS.md CONTEXT.md GOALS.md CONSTITUTION.md README.md CHANGELOG.md

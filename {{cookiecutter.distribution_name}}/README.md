@@ -1,5 +1,14 @@
 # {{ cookiecutter.distribution_name }}
 
+[![Tests](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/tests.yml/badge.svg)](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/tests.yml)
+[![Build](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/build.yml/badge.svg)](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/build.yml)
+[![Publish](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/publish.yml/badge.svg)](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/actions/workflows/publish.yml)
+[![codecov](https://codecov.io/gh/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/branch/main/graph/badge.svg)](https://codecov.io/gh/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }})
+[![PyPI](https://img.shields.io/pypi/v/{{ cookiecutter.distribution_name }})](https://pypi.org/project/{{ cookiecutter.distribution_name }}/)
+[![Python](https://img.shields.io/pypi/pyversions/{{ cookiecutter.distribution_name }})](https://pypi.org/project/{{ cookiecutter.distribution_name }}/)
+[![Django](https://img.shields.io/pypi/djversions/{{ cookiecutter.distribution_name }})](https://pypi.org/project/{{ cookiecutter.distribution_name }}/)
+[![License](https://img.shields.io/github/license/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }})](https://github.com/{{ cookiecutter._github_owner }}/{{ cookiecutter.distribution_name }}/blob/main/LICENSE)
+
 {{ cookiecutter.description }}
 
 <!--
@@ -10,9 +19,11 @@
   Every link is absolute. A relative link resolves on GitHub and 404s on PyPI,
   which is where the person deciding is most likely to be standing.
 
-  Badges go here once the repository is public — the dynamic ones read the
-  GitHub API anonymously and render as "404" or "invalid" against a private
-  repository, which looks worse than having none.
+  The badge row above is the standard set for a published package: one status
+  badge per workflow that runs on a push or a pull request, then coverage, the
+  PyPI version, supported Python and Django, and the licence. A workflow added
+  later gets its badge in the same row. The PyPI badges read "not found" until
+  the first release, and the GitHub ones need the repository to be public.
 
   Sections, in this order:
     1. One sentence, above. What it does, for whom.

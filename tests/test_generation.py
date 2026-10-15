@@ -129,6 +129,24 @@ class TestGeneratedLayout:
         assert sdist["include"] == ["/mvp_example", "/README.md", "/LICENSE"]
 
 
+class TestReadmeBadges:
+    def test_every_workflow_that_reports_status_has_a_badge(
+        self, generated: Path
+    ) -> None:
+        # One status badge per workflow that runs on a push or a pull request,
+        # above the first section.
+        head = (generated / "README.md").read_text().split("\n## ", 1)[0]
+        for workflow in ("tests.yml", "build.yml", "publish.yml"):
+            assert (generated / ".github" / "workflows" / workflow).is_file()
+            assert f"actions/workflows/{workflow}/badge.svg" in head
+
+    def test_the_package_badges_name_the_distribution(self, generated: Path) -> None:
+        head = (generated / "README.md").read_text().split("\n## ", 1)[0]
+        name = generated.name
+        for kind in ("v", "pyversions", "djversions"):
+            assert f"img.shields.io/pypi/{kind}/{name})" in head
+
+
 class TestNothingIsLeftUnrendered:
     def test_no_placeholder_survives(self, generated: Path) -> None:
         offenders = [

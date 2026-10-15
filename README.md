@@ -1,5 +1,8 @@
 # django-mvp-cookiecutter
 
+[![CI](https://github.com/django-mvp/django-mvp-cookiecutter/actions/workflows/ci.yml/badge.svg)](https://github.com/django-mvp/django-mvp-cookiecutter/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/github/license/django-mvp/django-mvp-cookiecutter)](https://github.com/django-mvp/django-mvp-cookiecutter/blob/main/LICENSE)
+
 A [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for
 packages that extend [django-mvp](https://github.com/django-mvp/django-mvp).
 
